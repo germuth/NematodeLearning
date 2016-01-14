@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <html>
-<body>
-	<link rel="stylesheet" type="text/css" href="mystyle.css">
+	<head>
+		<title></title>
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="mystyle.css">
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script src="app.js"></script>
+		<!-- box2d libraries -->
+		<script type="text/javascript" src="js/Box2D/box2d.js"></script>
+		<script type="text/javascript" src="js/Box2D/embox2d-helpers.js"></script>
+		<script type="text/javascript" src="js/Box2D/embox2d-html5canvas-debugDraw.js"></script>
+		<script type="text/javascript" src="js/Box2D/embox2d-html5canvas-testbed.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/fallingShapes.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/pyramid.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/car.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/balancedMobile.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/pulleyJoint.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/ropeJoint.js"></script>
+		<script type="text/javascript" src="js/Box2D/tests/dominos.js"></script>
+		<script type="text/javascript">  
+				var Box2D;
+				if (!Box2D) Box2D = (typeof Box2D !== 'undefined' ? Box2D : null) || Module;
+				window.onload = function() {
+						using(Box2D, "b2.+")
+						init();
+						changeTest();
+						animate();
+				};        
+		</script>
 
-	<div id="container">
-	</div>
+		<!-- app -->
 
-</body
+	</head>
+	<body>
+		<center>
+			<canvas id="canvas" width="600" height="500"></canvas>
+			<div id="container"></div>
+		</center>
+	</body>
 </html>

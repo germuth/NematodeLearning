@@ -1,6 +1,8 @@
 
 var embox2dTest_dominos = function() {
     //constructor
+    this.wormBody = new Array();
+    this.wormJoints = new Array();
 }
 
 embox2dTest_dominos.prototype.setNiceViewCenter = function() {
@@ -37,30 +39,26 @@ embox2dTest_dominos.prototype.setup = function() {
         var fd = new b2FixtureDef();
         fd.set_shape(shape);
         // fd.set_density(20.0);
-        fd.set_density(2.0);
-        // fd.set_friction(0.2);
+        fd.set_density(20.0);
+        fd.set_friction(0.2);
         // fd.get_filter().set_categoryBits(0x0001);
         // fd.get_filter().set_maskBits(0xFFFF & ~0x0002);
 
         var jd = new b2RevoluteJointDef();
         jd.set_collideConnected(false);
-        /*
         jd.set_enableMotor(true);
-        jd.set_maxMotorTorque(20.0);
-        jd.set_motorSpeed(5.0);
-        */
+        jd.set_maxMotorTorque(0.0);
+        jd.set_motorSpeed(0.0);
 
         var N = 10;
         var y = 15.0;
         //var ropeDef = new b2RopeJointDef();
         //ropeDef.get_localAnchorA().Set(0.0, y);
 
-        this.wormBody = new Array();
-        this.wormJoints = new Array();
 
         var prevBody;
         var wormJoint;
-        for (var i = 0; i < 2; ++i)
+        for (var i = 0; i < N; ++i)
         {
             var bd = new b2BodyDef();
             bd.set_type(b2_dynamicBody);
@@ -71,7 +69,10 @@ embox2dTest_dominos.prototype.setup = function() {
             if(i != 0){
               var anchor = new b2Vec2(i, y);
               jd.Initialize(prevBody, body, anchor);
-              wormJoint = world.CreateJoint(jd);
+              //wormJoint = Box2D.castObject( world.CreateJoint(jd), b2WheelJoint );
+              wormJoint = Box2D.castObject( world.CreateJoint(jd), b2RevoluteJoint );
+              //var test = wormJoint.GetMotorTorque();
+              //wormJoint = world.CreateJoint(jd);
             }
 
             prevBody = body;

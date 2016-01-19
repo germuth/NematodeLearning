@@ -31,6 +31,17 @@ embox2dTest_dominos.prototype.setup = function() {
     shape.SetAsBox(0.25, 1.5, new b2Vec2(-7.0, 4.0), 0.0);
     ground.CreateFixture(shape, 0.0);
 
+    //create the floor for friction
+    var floor;
+    {
+      var shape = new b2PolygonShape();
+      shape.SetAsBox(15.0, 15.0);
+      var bd = new b2BodyDef();
+      bd.set_type(b2_staticBody);
+      bd.set_position(new b2Vec2(0.0, 10.0));
+      floor = world.CreateBody(bd);
+      //floor.CreateFixture(shape, 0.0);
+    }
     //create the worm
     {
         var shape = new b2PolygonShape();
@@ -69,11 +80,15 @@ embox2dTest_dominos.prototype.setup = function() {
             if(i != 0){
               var anchor = new b2Vec2(i, y);
               jd.Initialize(prevBody, body, anchor);
-              //wormJoint = Box2D.castObject( world.CreateJoint(jd), b2WheelJoint );
               wormJoint = Box2D.castObject( world.CreateJoint(jd), b2RevoluteJoint );
-              //var test = wormJoint.GetMotorTorque();
-              //wormJoint = world.CreateJoint(jd);
             }
+
+            //add friction to the floor
+            var frictionj = new b2FrictionJointDef();
+            frictionj.Initialize(body, floor, new b2Vec2(0,0));
+            frictionj.set_maxForce(10.5);
+            frictionj.set_maxTorque(10.5);
+            world.CreateJoint(frictionj);
 
             prevBody = body;
             this.wormBody.push(prevBody);//complexity?

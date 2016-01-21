@@ -1,4 +1,3 @@
-
 var PTM = 32;
 
 var world = null;
@@ -323,38 +322,12 @@ function createWorld() {
     //eval( "currentTest = new embox2dTest_dominos();" );
     currentTest = new embox2dTest_dominos();
 
-    //create neural neutwork
-    this.nn = new Architect.Perceptron(9+9+2, 25, 9);
     currentTest.setup();
 }
 
 function resetScene() {
     createWorld();
     draw();
-}
-
-//every step nn is asked what to do again, based on where it is
-function worm() {
-  //what are the current angles
-  var angles = currentTest.wormJoints.map(
-    function(currentValue, index, array){
-      return currentValue.GetJointAngle();
-  });
-
-  //what are the current angles
-  var speeds = currentTest.wormJoints.map(
-    function(currentValue, index, array){
-      return currentValue.GetMotorSpeed();
-  });
-
-  //where am i (vector) (heads position)
-  var pos = currentTest.wormBody[0].GetPosition();
-
-  //where do i want to go
-  // var dest = new b2Vec2(0.0, 0.0);
-
-  var input = angles.concat(speeds).concat(pos.get_x()).concat(pos.get_y());
-  return this.nn.activate(input);
 }
 
 function step(timestamp) {
@@ -364,16 +337,6 @@ function step(timestamp) {
 
     if ( ! showStats ) {
       //adjust worm motors to output of nn
-      var nn_output = worm();
-      for(var i = 0; i < currentTest.wormJoints.length; i++){
-        var output = nn_output[i];
-        //is from [0-1], scale to [-1 1]
-        output -= 0.5;
-        output *= 2;
-        currentTest.wormJoints[i].SetMotorSpeed(output);
-        //currentTest.wormJoints[i].SetMotorSpeed(nn_output[i]);
-      }
-
         world.Step(1/60, 3, 2);
         draw();
         return;

@@ -1,5 +1,6 @@
 
 
+//this is a poor name, it should be called solo-worm or someone
 var geneticAlgorithm = function() {
     //constructor
     this.wormBody = new Array();

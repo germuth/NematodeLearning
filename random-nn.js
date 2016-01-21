@@ -1,4 +1,3 @@
-
 var PTM = 32;
 
 var world = null;

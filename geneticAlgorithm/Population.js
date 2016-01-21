@@ -1,4 +1,4 @@
-var POPULATION_SIZE = 5;
+var POPULATION_SIZE = 100;
 var Population = function() {
     this.members = [];
     this.generationNumber = 0;
@@ -22,7 +22,7 @@ Population.prototype.sort = function() {
         return a.cost - b.cost;
     });
 }
-Population.prototype.generation = function() {
+Population.prototype.generation = function(iter) {
     //no crossover for now
     //var children = this.members[0].mate(this.members[1]);
     //this.members.splice(this.members.length - 2, 2, children[0], children[1]);
@@ -39,7 +39,8 @@ Population.prototype.generation = function() {
         this.members[i].calcCost();
         average += this.members[i].cost;
     }
-    console.log(average/POPULATION_SIZE);
+    console.log(iter + "/25. avg: " + Math.round(average/POPULATION_SIZE*100)/100 +
+      " best: " + Math.round(this.members[0].cost*100)/100);
 
     this.sort();
 

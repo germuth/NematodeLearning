@@ -1,9 +1,9 @@
 //mutate 10% of connections
-var MUTATE_PERCENT = 0.10;
+var MUTATE_PERCENT = 0.20;
 //whether perturbations or complete resets are used
 var MUTATE_WITH_PERTURB = true;
 //how much to perturb by
-var PERTURB_PERCENT = 0.10;
+var PERTURB_PERCENT = 0.50;
 
 var Gene = function(network) {
     this.isUpdated = false;
@@ -82,8 +82,8 @@ Gene.prototype.calcCost = function() {
     var currentTest = new geneticAlgorithm();
     currentTest.setup(world);
 
-    //give the worm 60 seconds to get somewhere
-    for(var i = 0; i < 60; i++){
+    //give the worm 20 seconds to get somewhere
+    for(var i = 0; i < 60*20; i++){
         var angles = currentTest.wormJoints.map(
             function(currentValue, index, array){
                 return currentValue.GetJointAngle();

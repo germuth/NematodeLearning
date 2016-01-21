@@ -74,7 +74,7 @@ function onMouseMove(canvas, evt) {
     if ( shiftDown ) {
         canvasOffset.x += (mousePosPixel.x - prevMousePosPixel.x);
         canvasOffset.y -= (mousePosPixel.y - prevMousePosPixel.y);
-        //draw();
+        draw();
     }
     else if ( mouseDown && mouseJoint != null ) {
         mouseJoint.SetTarget( new b2Vec2(mousePosWorld.x, mousePosWorld.y) );
@@ -183,7 +183,7 @@ function onKeyDown(canvas, evt) {
     if ( currentTest && currentTest.onKeyDown )
         currentTest.onKeyDown(canvas, evt);
 
-    //draw();
+    draw();
 }
 
 function onKeyUp(canvas, evt) {
@@ -201,7 +201,7 @@ function zoomIn() {
     var newViewCenterWorld = getWorldPointFromPixelPoint( viewCenterPixel );
     canvasOffset.x += (newViewCenterWorld.x-currentViewCenterWorld.x) * PTM;
     canvasOffset.y -= (newViewCenterWorld.y-currentViewCenterWorld.y) * PTM;
-    //draw();
+    draw();
 }
 
 function zoomOut() {
@@ -210,7 +210,7 @@ function zoomOut() {
     var newViewCenterWorld = getWorldPointFromPixelPoint( viewCenterPixel );
     canvasOffset.x += (newViewCenterWorld.x-currentViewCenterWorld.x) * PTM;
     canvasOffset.y -= (newViewCenterWorld.y-currentViewCenterWorld.y) * PTM;
-    //draw();
+    draw();
 }
 
 function updateDebugDrawCheckboxesFromWorld() {
@@ -300,13 +300,35 @@ function changeTest() {
     if ( currentTest && currentTest.setNiceViewCenter )
         currentTest.setNiceViewCenter();
     updateDebugDrawCheckboxesFromWorld();
-    //draw();
+    draw();
 }
 
 
 function resetScene() {
     createWorld();
-    //draw();
+    draw();
+}
+
+function createWorld(){
+  if ( world != null )
+  Box2D.destroy(world);
+
+  //var gravity = new b2Vec2(0.0, -10.0);
+  var gravity = new b2Vec2(0.0, 0.0);
+  world = new b2World( gravity );
+  world.SetDebugDraw(myDebugDraw);
+
+  mouseJointGroundBody = world.CreateBody( new b2BodyDef() );
+
+  //var e = document.getElementById("testSelection");
+  //var v = e.options[e.selectedIndex].value;
+
+  currentTest = new geneticAlgorithm();
+
+  //create neural neutwork based on best genetic algorithm
+  // this.nn = new Architect.Perceptron(9+9+2, 25, 9);
+  this.nn = population.members[0].network;
+  currentTest.setup(world);
 }
 
 function step(timestamp) {
@@ -325,9 +347,32 @@ function step(timestamp) {
   }
 
   world.Step(1/60, 3, 2);
-  //we don't want draw
-  //draw();
+  draw();
   return;
+}
+
+//every step nn is asked what to do again, based on where it is
+function worm() {
+  //what are the current angles
+  var angles = currentTest.wormJoints.map(
+    function(currentValue, index, array){
+      return currentValue.GetJointAngle();
+  });
+
+  //what are the current angles
+  var speeds = currentTest.wormJoints.map(
+    function(currentValue, index, array){
+      return currentValue.GetMotorSpeed();
+  });
+
+  //where am i (vector) (heads position)
+  var pos = currentTest.wormBody[0].GetPosition();
+
+  //where do i want to go
+  // var dest = new b2Vec2(0.0, 0.0);
+
+  var input = angles.concat(speeds).concat(pos.get_x()).concat(pos.get_y());
+  return this.nn.activate(input);
 }
 
 function draw() {
@@ -390,13 +435,14 @@ window.requestAnimFrame = (function(){
 
 function animate() {
     if ( run )
-        //requestAnimFrame( animate );
+        requestAnimFrame( animate );
     step();
 }
 
 var iteration = 0;
+var GENETIC_ALGORITHM_ITERATION_COUNT = 25;
 function doCalculation() {
-    population.generation();
+    population.generation(iteration);
     iteration++;
     return iteration;
 }
@@ -405,23 +451,35 @@ function pump() {
     var percent_complete=doCalculation();
     //maybe update a progress meter here!
     //carry on pumping?
-    if (percent_complete<50) {
+    if (percent_complete < GENETIC_ALGORITHM_ITERATION_COUNT) {
         setTimeout(pump, 50);
+    }else{
+      displayResults();
     }
-    console.log(population.members[0].cost);
+}
+
+function displayResults(){
+  //print json to console to save nn
+  console.log("output neural network with cost: " + population.members[0].cost);
+  console.log(population.members[0].network.toJSON());
+  //init(); already initiliazed
+  changeTest();
+  animate();
 }
 
 var population;
 function start() {
-    population = new Population();
-    //population.generation();
+  using(Box2D, "b2.+")
+  init();
+  population = new Population();
+  //population.generation();
 
-    pump();
+  pump();
 
-    // var generations = 1;
-    // while(!population.generation() && generations != 0){
-    //     generations--;
-    // }
+  // var generations = 1;
+  // while(!population.generation() && generations != 0){
+  //     generations--;
+  // }
 }
 
 function pause() {

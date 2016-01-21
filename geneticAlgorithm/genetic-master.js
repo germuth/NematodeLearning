@@ -1,4 +1,3 @@
-
 var PTM = 32;
 
 var world = null;
@@ -75,7 +74,7 @@ function onMouseMove(canvas, evt) {
     if ( shiftDown ) {
         canvasOffset.x += (mousePosPixel.x - prevMousePosPixel.x);
         canvasOffset.y -= (mousePosPixel.y - prevMousePosPixel.y);
-        draw();
+        //draw();
     }
     else if ( mouseDown && mouseJoint != null ) {
         mouseJoint.SetTarget( new b2Vec2(mousePosWorld.x, mousePosWorld.y) );
@@ -184,7 +183,7 @@ function onKeyDown(canvas, evt) {
     if ( currentTest && currentTest.onKeyDown )
         currentTest.onKeyDown(canvas, evt);
 
-    draw();
+    //draw();
 }
 
 function onKeyUp(canvas, evt) {
@@ -202,7 +201,7 @@ function zoomIn() {
     var newViewCenterWorld = getWorldPointFromPixelPoint( viewCenterPixel );
     canvasOffset.x += (newViewCenterWorld.x-currentViewCenterWorld.x) * PTM;
     canvasOffset.y -= (newViewCenterWorld.y-currentViewCenterWorld.y) * PTM;
-    draw();
+    //draw();
 }
 
 function zoomOut() {
@@ -211,7 +210,7 @@ function zoomOut() {
     var newViewCenterWorld = getWorldPointFromPixelPoint( viewCenterPixel );
     canvasOffset.x += (newViewCenterWorld.x-currentViewCenterWorld.x) * PTM;
     canvasOffset.y -= (newViewCenterWorld.y-currentViewCenterWorld.y) * PTM;
-    draw();
+    //draw();
 }
 
 function updateDebugDrawCheckboxesFromWorld() {
@@ -301,97 +300,34 @@ function changeTest() {
     if ( currentTest && currentTest.setNiceViewCenter )
         currentTest.setNiceViewCenter();
     updateDebugDrawCheckboxesFromWorld();
-    draw();
+    //draw();
 }
 
-function createWorld() {
-
-    if ( world != null )
-        Box2D.destroy(world);
-
-    //var gravity = new b2Vec2(0.0, -10.0);
-    var gravity = new b2Vec2(0.0, 0.0);
-    world = new b2World( gravity );
-    world.SetDebugDraw(myDebugDraw);
-
-    mouseJointGroundBody = world.CreateBody( new b2BodyDef() );
-
-    //var e = document.getElementById("testSelection");
-    //var v = e.options[e.selectedIndex].value;
-
-    //eval( "currentTest = new "+v+"();" );
-    //eval( "currentTest = new embox2dTest_dominos();" );
-    currentTest = new embox2dTest_dominos();
-
-    //create neural neutwork
-
-    this.nn = new Architect.Perceptron(9+9+2, 25, 9);
-    currentTest.setup();
-}
 
 function resetScene() {
     createWorld();
-    draw();
-}
-
-//every step nn is asked what to do again, based on where it is
-function worm() {
-  //what are the current angles
-  var angles = currentTest.wormJoints.map(
-    function(currentValue, index, array){
-      return currentValue.GetJointAngle();
-  });
-
-  //what are the current angles
-  var speeds = currentTest.wormJoints.map(
-    function(currentValue, index, array){
-      return currentValue.GetMotorSpeed();
-  });
-
-  //where am i (vector) (heads position)
-  var pos = currentTest.wormBody[0].GetPosition();
-
-  //where do i want to go
-  // var dest = new b2Vec2(0.0, 0.0);
-
-  var input = angles.concat(speeds).concat(pos.get_x()).concat(pos.get_y());
-  return this.nn.activate(input);
+    //draw();
 }
 
 function step(timestamp) {
 
-    if ( currentTest && currentTest.step )
-        currentTest.step();
+  if ( currentTest && currentTest.step )
+    currentTest.step();
 
-    if ( ! showStats ) {
-      //adjust worm motors to output of nn
-      var nn_output = worm();
-      for(var i = 0; i < currentTest.wormJoints.length; i++){
-        var output = nn_output[i];
-        //is from [0-1], scale to [-1 1]
-        output -= 0.5;
-        output *= 2;
-        currentTest.wormJoints[i].SetMotorSpeed(output);
-        //currentTest.wormJoints[i].SetMotorSpeed(nn_output[i]);
-      }
+  //adjust worm motors to output of nn
+  var nn_output = worm();
+  for(var i = 0; i < currentTest.wormJoints.length; i++){
+    var output = nn_output[i];
+    //is from [0-1], scale to [-1 1]
+    output -= 0.5;
+    output *= 2;
+    currentTest.wormJoints[i].SetMotorSpeed(output);
+  }
 
-        world.Step(1/60, 3, 2);
-        draw();
-        return;
-    }
-
-    var current = Date.now();
-
-    world.Step(1/60, 3, 2);
-    var frametime = (Date.now() - current);
-    frameTime60 = frameTime60 * (59/60) + frametime * (1/60);
-
-    draw();
-    statusUpdateCounter++;
-    if ( statusUpdateCounter > 20 ) {
-        updateStats();
-        statusUpdateCounter = 0;
-    }
+  world.Step(1/60, 3, 2);
+  //we don't want draw
+  //draw();
+  return;
 }
 
 function draw() {
@@ -454,8 +390,38 @@ window.requestAnimFrame = (function(){
 
 function animate() {
     if ( run )
-        requestAnimFrame( animate );
+        //requestAnimFrame( animate );
     step();
+}
+
+var iteration = 0;
+function doCalculation() {
+    population.generation();
+    iteration++;
+    return iteration;
+}
+
+function pump() {
+    var percent_complete=doCalculation();
+    //maybe update a progress meter here!
+    //carry on pumping?
+    if (percent_complete<50) {
+        setTimeout(pump, 50);
+    }
+    console.log(population.members[0].cost);
+}
+
+var population;
+function start() {
+    population = new Population();
+    //population.generation();
+
+    pump();
+
+    // var generations = 1;
+    // while(!population.generation() && generations != 0){
+    //     generations--;
+    // }
 }
 
 function pause() {

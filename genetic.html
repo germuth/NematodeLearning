@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C. Elegans Learning</title>
+		<title>C. Elegans Genetic Algorithm</title>
 		<!-- css -->
 		<link rel="stylesheet" type="text/css" href="mystyle.css">
 
@@ -12,23 +12,21 @@
 		<script type="text/javascript" src="js/Box2D/box2d.js"></script>
 		<script type="text/javascript" src="js/Box2D/embox2d-helpers.js"></script>
 		<script type="text/javascript" src="js/Box2D/embox2d-html5canvas-debugDraw.js"></script>
-		<script type="text/javascript" src="js/Box2D/embox2d-html5canvas-testbed.js"></script>
 
-		<script type="text/javascript" src="js/Box2D/tests/fallingShapes.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/pyramid.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/car.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/balancedMobile.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/pulleyJoint.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/ropeJoint.js"></script>
-		<script type="text/javascript" src="js/Box2D/tests/dominos.js"></script>
+		<!-- genetic -->
+		<script type="text/javascript" src="geneticAlgorithm/genetic-master.js"></script>
+		<script type="text/javascript" src="geneticAlgorithm/genetic-setup.js"></script>
+		<script type="text/javascript" src="geneticAlgorithm/Gene.js"></script>
+		<script type="text/javascript" src="geneticAlgorithm/Population.js"></script>
+
 		<script type="text/javascript">
 				var Box2D;
 				if (!Box2D) Box2D = (typeof Box2D !== 'undefined' ? Box2D : null) || Module;
 				window.onload = function() {
-						using(Box2D, "b2.+")
-						init();
-						changeTest();
-						animate();
+						//using(Box2D, "b2.+")
+						//init();
+						//changeTest();
+						start();
 				};
 		</script>
 

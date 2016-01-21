@@ -168,7 +168,7 @@ function onKeyDown(canvas, evt) {
     }
     else if ( evt.keyCode >=49 && evt.keyCode <= 57){
         //they pressed one of the numbers
-        var numPressed = evt.keyCode - 48;
+        var numPressed = evt.keyCode - 49;
         var selected = currentTest.wormJoints[numPressed];
         if(selected.GetMotorSpeed() == 0.0){
           selected.SetMaxMotorTorque(500.0);

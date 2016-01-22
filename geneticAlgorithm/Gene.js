@@ -1,9 +1,9 @@
 //mutate 10% of connections
-var MUTATE_PERCENT = 0.20;
+var MUTATE_PERCENT = 0.10;
 //whether perturbations or complete resets are used
 var MUTATE_WITH_PERTURB = true;
 //how much to perturb by
-var PERTURB_PERCENT = 0.50;
+var PERTURB_PERCENT = 0.10;
 
 var Gene = function(network) {
     this.isUpdated = false;
@@ -133,6 +133,8 @@ Gene.prototype.calcCost = function() {
 
     //get position of head
     var head_pos = currentTest.wormBody[0].GetPosition();
-    //cost is distance to origin
-    this.cost = Math.sqrt(Math.pow(head_pos.get_x(),2) + Math.pow(head_pos.get_y(),2));
+    // //cost is distance to origin
+    // this.cost = Math.sqrt(Math.pow(head_pos.get_x(),2) + Math.pow(head_pos.get_y(),2));
+    // cost is how far to the left you can travel (more negative is good)
+    this.cost = head_pos.get_x();
 };

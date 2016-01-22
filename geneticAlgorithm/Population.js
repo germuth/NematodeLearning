@@ -1,10 +1,11 @@
-var POPULATION_SIZE = 100;
+var POPULATION_SIZE = 25;
 var Population = function() {
     this.members = [];
     this.generationNumber = 0;
     var size = POPULATION_SIZE;
     while (size--) { //randomly create population
-        var gene = new Gene(new Architect.Perceptron(9+9+2, 25, 9));
+        // var gene = new Gene(new Architect.Perceptron(9+9+2, 25, 9));
+        var gene = new Gene(new Architect.Perceptron(9+9, 25, 9));
         this.members.push(gene);
     }
 };
@@ -39,12 +40,13 @@ Population.prototype.generation = function(iter) {
         this.members[i].calcCost();
         average += this.members[i].cost;
     }
-    console.log(iter + "/25. avg: " + Math.round(average/POPULATION_SIZE*100)/100 +
-      " best: " + Math.round(this.members[0].cost*100)/100);
 
     this.sort();
 
-    if (this.members[0].cost <= 5.0) {
+    console.log(iter + ". avg: " + Math.round((average/(POPULATION_SIZE*2))*100)/100 +
+      " best: " + Math.round(this.members[0].cost*100)/100);
+
+    if (this.members[0].cost <= -5.0) {
         return true;
     }
 

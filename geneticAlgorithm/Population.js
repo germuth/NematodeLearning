@@ -5,7 +5,10 @@ var Population = function() {
     var size = POPULATION_SIZE;
     while (size--) { //randomly create population
         // var gene = new Gene(new Architect.Perceptron(9+9+2, 25, 9));
-        var gene = new Gene(new Architect.Perceptron(9+9, 25, 9));
+        // var gene = new Gene(new Architect.Perceptron(9+9, 25, 9));
+        //neuron takes in angle and speed of every joint
+        //turns it into speed and torque of every joint
+        var gene = new Gene(new Architect.Perceptron(9+9, 25, 9+9));
         this.members.push(gene);
     }
 };

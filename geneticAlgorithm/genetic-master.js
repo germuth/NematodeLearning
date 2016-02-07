@@ -166,19 +166,6 @@ function onKeyDown(canvas, evt) {
     else if ( evt.keyCode == 16 ) {//shift
         shiftDown = true;
     }
-    else if ( evt.keyCode >=49 && evt.keyCode <= 57){
-        //they pressed one of the numbers
-        var numPressed = evt.keyCode - 48;
-        var selected = currentTest.wormJoints[numPressed];
-        if(selected.GetMotorSpeed() == 0.0){
-          selected.SetMaxMotorTorque(500.0);
-          selected.SetMotorSpeed(1.0);
-        } else if(selected.GetMotorSpeed() > 0.0){
-          selected.SetMotorSpeed(-1.0);
-        } else{
-          selected.SetMotorSpeed(0.0);
-        }
-    }
 
     if ( currentTest && currentTest.onKeyDown )
         currentTest.onKeyDown(canvas, evt);
@@ -243,7 +230,6 @@ function updateContinuousRefreshStatus() {
 }
 
 function init() {
-
     canvas = document.getElementById("canvas");
     context = canvas.getContext( '2d' );
 
@@ -338,12 +324,15 @@ function step(timestamp) {
 
   //adjust worm motors to output of nn
   var nn_output = worm();
-  for(var i = 0; i < currentTest.wormJoints.length; i++){
-    var output = nn_output[i];
-    //is from [0-1], scale to [-2 2]
-    output -= 0.5;
-    output *= 4;
-    currentTest.wormJoints[i].SetMotorSpeed(output);
+  var worm_length = currentTest.wormJoints.length;
+  for(var i = 0; i < worm_length; i++){
+    var speed = nn_output[i];
+    var torque = nn_output[i + worm_length];
+    //outputs are from [0-1], scale speed to [-2 2], torque to [0, 500]
+    speed = 4 * (speed - 0.5);
+    torque *= 500;
+    currentTest.wormJoints[i].SetMotorSpeed(speed);
+    currentTest.wormJoints[i].SetMaxMotorTorque(torque);
   }
 
   world.Step(1/60, 3, 2);
@@ -362,7 +351,7 @@ function worm() {
       return x;
   });
 
-  //what are the current angles
+  //what are the current speeds
   var speeds = currentTest.wormJoints.map(
     function(currentValue, index, array){
       //returns a speed from [-2 2]
@@ -415,19 +404,10 @@ function draw() {
 }
 
 function updateStats() {
-    if ( ! showStats )
-        return;
-    var currentViewCenterWorld = getWorldPointFromPixelPoint( viewCenterPixel );
     var fbSpan = document.getElementById('feedbackSpan');
     fbSpan.innerHTML =
-        "Status: "+(run?'running':'paused') +
-        "<br>Physics step time (average of last 60 steps): "+myRound(frameTime60,2)+"ms" +
-        //"<br>Mouse down: "+mouseDown +
-        "<br>PTM: "+myRound(PTM,2) +
-        "<br>View center: "+myRound(currentViewCenterWorld.x,3)+", "+myRound(currentViewCenterWorld.y,3) +
-        //"<br>Canvas offset: "+myRound(canvasOffset.x,0)+", "+myRound(canvasOffset.y,0) +
-        "<br>Mouse pos (pixel): "+mousePosPixel.x+", "+mousePosPixel.y +
-        "<br>Mouse pos (world): "+myRound(mousePosWorld.x,3)+", "+myRound(mousePosWorld.y,3);
+        "<br>Iteration: " + iteration +
+        "<br>Best: " + population.members[0].cost;
 }
 
 window.requestAnimFrame = (function(){
@@ -448,15 +428,16 @@ function animate() {
 }
 
 var iteration = 0;
-var GENETIC_ALGORITHM_ITERATION_COUNT = 50;
+var GENETIC_ALGORITHM_ITERATION_COUNT = 10;
 function doCalculation() {
     population.generation(iteration);
+    updateStats();
     iteration++;
     return iteration;
 }
 
 function pump() {
-    var percent_complete=doCalculation();
+    var percent_complete = doCalculation();
     //maybe update a progress meter here!
     //carry on pumping?
     if (percent_complete < GENETIC_ALGORITHM_ITERATION_COUNT) {

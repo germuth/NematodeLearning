@@ -83,7 +83,7 @@ Gene.prototype.calcCost = function() {
     currentTest.setup(world);
 
     //give the worm 20 seconds to get somewhere
-    for(var i = 0; i < 60*20; i++){
+    for(var i = 0; i < 60*8; i++){
         var angles = currentTest.wormJoints.map(
             function(currentValue, index, array){
                 return currentValue.GetJointAngle();

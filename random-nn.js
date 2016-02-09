@@ -13,6 +13,7 @@ function createWorld() {
     //var e = document.getElementById("testSelection");
     //var v = e.options[e.selectedIndex].value;
 
+
     //eval( "currentTest = new "+v+"();" );
     //eval( "currentTest = new embox2dTest_dominos();" );
     currentTest = new embox2dTest_dominos();

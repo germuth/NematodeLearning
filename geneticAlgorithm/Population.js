@@ -1,4 +1,4 @@
-var POPULATION_SIZE = 25;
+var POPULATION_SIZE = 30;
 var Population = function() {
     this.members = [];
     this.generationNumber = 0;

@@ -15,9 +15,10 @@
 
 		<!-- genetic -->
 		<script type="text/javascript" src="geneticAlgorithm/genetic-master.js"></script>
-		<script type="text/javascript" src="geneticAlgorithm/genetic-setup.js"></script>
+		<script type="text/javascript" src="setup-just-worm.js"></script>
 		<script type="text/javascript" src="geneticAlgorithm/Gene.js"></script>
 		<script type="text/javascript" src="geneticAlgorithm/Population.js"></script>
+		<script type="text/javascript" src="common.js"></script>
 
 		<script type="text/javascript">
 				var Box2D;
@@ -35,9 +36,10 @@
 	</head>
 	<body>
 		<!-- <center> -->
-			<button type="button" onclick="start()">Start Genetic Algorithm</button>
+			<button type="button" id="startbutton" onclick="start()">Start Genetic Algorithm</button>
 			<canvas id="canvas" width="600" height="500" tabindex="1"></canvas>
 			<span id="feedbackSpan"></span>
+			<a download="network" id="downloadlink" style="display: none">Download Network</a>
 		<!-- </center> -->
 	</body>
 </html>

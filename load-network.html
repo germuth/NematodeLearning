@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C. Elegans Interactive</title>
+		<title>C. Elegans Load Network</title>
 		<!-- css -->
 		<link rel="stylesheet" type="text/css" href="mystyle.css">
 
@@ -12,18 +12,15 @@
 		<script type="text/javascript" src="js/Box2D/box2d.js"></script>
 		<script type="text/javascript" src="js/Box2D/embox2d-helpers.js"></script>
 		<script type="text/javascript" src="js/Box2D/embox2d-html5canvas-debugDraw.js"></script>
-		<script type="text/javascript" src="interactive.js"></script>
+		<script type="text/javascript" src="load-network.js"></script>
 		<script type="text/javascript" src="common.js"></script>
+		<script type="text/javascript" src="setup-just-worm.js"></script>
 
-		<script type="text/javascript" src="js/Box2D/tests/dominos.js"></script>
 		<script type="text/javascript">
 				var Box2D;
 				if (!Box2D) Box2D = (typeof Box2D !== 'undefined' ? Box2D : null) || Module;
 				window.onload = function() {
 						using(Box2D, "b2.+")
-						init();
-						changeTest();
-						animate();
 				};
 		</script>
 
@@ -32,6 +29,7 @@
 	</head>
 	<body>
 		<!-- <center> -->
+			<input type="file" id="input" onchange="loadNetwork(this.files)">
 			<canvas id="canvas" width="600" height="500" tabindex="1"></canvas>
 		<!-- </center> -->
 	</body>

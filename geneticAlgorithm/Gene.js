@@ -79,7 +79,7 @@ Gene.prototype.calcCost = function() {
     var world = new b2World( new b2Vec2(0.0, 0.0) );
     //world.SetDebugDraw(myDebugDraw);
     //mouseJointGroundBody = world.CreateBody( new b2BodyDef() );
-    var currentTest = new geneticAlgorithm();
+    var currentTest = new SetupJustWorm();
     currentTest.setup(world);
 
     //give the worm 20 seconds to get somewhere
@@ -136,5 +136,8 @@ Gene.prototype.calcCost = function() {
     // //cost is distance to origin
     // this.cost = Math.sqrt(Math.pow(head_pos.get_x(),2) + Math.pow(head_pos.get_y(),2));
     // cost is how far to the left you can travel (more negative is good)
-    this.cost = head_pos.get_x();
+    // this.cost = head_pos.get_x();
+
+    //cost is how far down he can get
+    this.cost = head_pos.get_y();
 };

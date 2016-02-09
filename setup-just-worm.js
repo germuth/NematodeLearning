@@ -1,19 +1,19 @@
 
 
 //this is a poor name, it should be called solo-worm or someone
-var geneticAlgorithm = function() {
+var SetupJustWorm = function() {
     //constructor
     this.wormBody = new Array();
     this.wormJoints = new Array();
 }
 
-geneticAlgorithm.prototype.setNiceViewCenter = function() {
+SetupJustWorm.prototype.setNiceViewCenter = function() {
     //called once when the user changes to this test from another test
     PTM = 26;
     setViewCenterWorld( new b2Vec2(0,8), true );
 }
 
-geneticAlgorithm.prototype.setup = function(world) {
+SetupJustWorm.prototype.setup = function(world) {
     //set up the Box2D scene here - the world is already created
     //create the floor for friction
     var floor;

@@ -1,8 +1,13 @@
 var PTM = 32;
 
+var FRAME_RATE = 24;
+var WORM_LENGTH = 10;
+var POS_CHECKS = 8;
+var VEL_CHECKS = 5;
 var world = null;
 var nn = null;
 var interactive = false;
+var printNNparams = false;
 var mouseJointGroundBody;
 var canvas;
 var context;
@@ -174,11 +179,12 @@ function onKeyDown(canvas, evt) {
         var selected = currentTest.wormJoints[numPressed];
         if(selected.GetMotorSpeed() == 0.0){
           selected.SetMaxMotorTorque(500.0);
-          selected.SetMotorSpeed(1.0);
+          selected.SetMotorSpeed(1.5);
         } else if(selected.GetMotorSpeed() > 0.0){
-          selected.SetMotorSpeed(-1.0);
+          selected.SetMotorSpeed(-0.5);
         } else{
           selected.SetMotorSpeed(0.0);
+          selected.SetMaxMotorTorque(0.0);
         }
     }
 
@@ -242,6 +248,11 @@ function updateContinuousRefreshStatus() {
     }
     else
         updateStats();
+}
+
+function toggleNNchkbox(){
+  printNNparams = document.getElementById("printNNchkbox").checked;
+  console.log(printNNparams);
 }
 
 function init() {
@@ -316,26 +327,18 @@ function step(timestamp) {
 
   //adjust worm motors to output of nn
   if(!interactive){
-    var nn_output = worm();
-    var worm_length = currentTest.wormJoints.length;
-    for(var i = 0; i < worm_length; i++){
-      var speed = nn_output[i];
-      var torque = nn_output[i + worm_length];
-      //outputs are from [0-1], scale speed to [-2 2], torque to [0, 500]
-      speed = 4 * (speed - 0.5);
-      torque *= 500;
-      currentTest.wormJoints[i].SetMotorSpeed(speed);
-      currentTest.wormJoints[i].SetMaxMotorTorque(torque);
-    }
+    var nn_output = nn.activate(worm_input());
+    apply_output(nn_output);
   }
 
-  world.Step(1/60, 3, 2);
+  world.Step(1/FRAME_RATE, POS_CHECKS, VEL_CHECKS);
+  // world.Step(1/FRAME_RATE, 8, 5);
   draw();
   return;
 }
 
 //every step nn is asked what to do again, based on where it is
-function worm() {
+function worm_input() {
   //what are the current angles
   var angles = currentTest.wormJoints.map(
     function(currentValue, index, array){
@@ -346,24 +349,46 @@ function worm() {
   });
 
   //what are the current speeds
-  var speeds = currentTest.wormJoints.map(
-    function(currentValue, index, array){
-      //returns a speed from [-2 2]
-      var x = currentValue.GetMotorSpeed() / 4; // [-.5 .5]
-      x += 0.5; // [0 1]
-      return x;
-  });
+  // var speeds = currentTest.wormJoints.map(
+  //   function(currentValue, index, array){
+  //     //returns a speed from [-2 2]
+  //     var x = currentValue.GetMotorSpeed() / 4; // [-.5 .5]
+  //     x += 0.5; // [0 1]
+  //     return x;
+  // });
 
   //where am i (vector) (heads position)
-  var pos = currentTest.wormBody[0].GetPosition();
+  // var pos = currentTest.wormBody[0].GetPosition();
 
   //where do i want to go
   // var dest = new b2Vec2(0.0, 0.0);
 
   // var input = angles.concat(speeds).concat(pos.get_x()).concat(pos.get_y());
   //don't need to put position in, just get to 0.0 0.0 in 10 seconds
-  var input = angles.concat(speeds);
-  return nn.activate(input);
+  if(printNNparams){
+    // console.log("INPUT: " + angles.concat(speeds));
+    console.log("INPUT: " + angles);
+  }
+  return angles;
+}
+
+function apply_output(nn_output){
+  var str = "OUTPUT: [";
+  var worm_joints = WORM_LENGTH - 1
+  for(var i = 0; i < worm_joints; i++){
+    var speed = nn_output[i];
+    var torque = nn_output[i + worm_joints];
+    //outputs are from [0-1], scale speed to [-2 2], torque to [0, 500]
+    speed = 3 * (speed - 0.5);
+    torque *= 500;
+    str += speed + ", ";
+    str += torque + ", ";
+    currentTest.wormJoints[i].SetMotorSpeed(speed);
+    currentTest.wormJoints[i].SetMaxMotorTorque(torque);
+  }
+  if(printNNparams){
+    console.log(str + "]");
+  }
 }
 
 function draw() {
@@ -404,7 +429,8 @@ window.requestAnimFrame = (function(){
             window.oRequestAnimationFrame      ||
             window.msRequestAnimationFrame     ||
             function( callback ){
-              window.setTimeout(callback, 1000 / 60);
+              // window.setTimeout(callback, 1000 / 60);
+              window.setTimeout(callback, 1000 / FRAME_RATE);
             };
 })();
 

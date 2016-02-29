@@ -30,11 +30,13 @@ SetupJustWorm.prototype.setup = function(world) {
     //create the worm
     {
         var shape = new b2PolygonShape();
-        shape.SetAsBox(0.5, 0.125);
+        shape.SetAsBox(0.4, 0.125);
 
         var fd = new b2FixtureDef();
         fd.set_shape(shape);
-        fd.set_density(20.0);
+        // fd.set_density(20.0);
+        fd.set_density(10.0);
+        // fd.set_friction(0.5);
         fd.set_friction(0.5);
 
         var jd = new b2RevoluteJointDef();
@@ -43,17 +45,18 @@ SetupJustWorm.prototype.setup = function(world) {
         jd.set_maxMotorTorque(500.0);
         jd.set_motorSpeed(0.0);
 
-        var N = 10;
         var y = 15.0;
 
         var prevBody;
         var wormJoint;
-        for (var i = 0; i < N; ++i)
+        for (var i = 0; i < WORM_LENGTH; ++i)
         {
             var bd = new b2BodyDef();
             bd.set_type(b2_dynamicBody);
             bd.set_position(new b2Vec2(0.5 + 1.0 * i, y));
             var body = world.CreateBody(bd);
+            // body.SetLinearDamping(5.5);
+            // body.SetAngularDamping(5.5);
             body.CreateFixture(fd);
 
             if(i != 0){
@@ -66,8 +69,8 @@ SetupJustWorm.prototype.setup = function(world) {
             //add friction to the floor
             var frictionj = new b2FrictionJointDef();
             frictionj.Initialize(body, floor, new b2Vec2(0,0));
-            frictionj.set_maxForce(20.5);
-            frictionj.set_maxTorque(20.5);
+            frictionj.set_maxForce(5.5);
+            frictionj.set_maxTorque(5.5);
             world.CreateJoint(frictionj);
 
             prevBody = body;

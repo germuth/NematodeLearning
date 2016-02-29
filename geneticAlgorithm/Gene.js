@@ -1,9 +1,11 @@
 //mutate 10% of connections
 var MUTATE_PERCENT = 0.10;
 //whether perturbations or complete resets are used
-var MUTATE_WITH_PERTURB = true;
+var MUTATE_WITH_PERTURB = false;
 //how much to perturb by
 var PERTURB_PERCENT = 0.10;
+//how many seconds of simulation for fitness function
+var SIMULATION_SECONDS = 8;
 
 var Gene = function(network) {
     this.isUpdated = false;
@@ -35,7 +37,7 @@ Gene.prototype.mutate = function() {
                         connection.weight -= connection.weight * PERTURB_PERCENT;
                     }
                 } else{ //completely reset value
-                    connection.weight = Math.random();
+                    connection.weight = (2*Math.random()) - 1.0;
                 }
             }
         }
@@ -76,41 +78,28 @@ Gene.prototype.calcCost = function() {
 
     //set up box2d world
     using(Box2D, "b2.+")
-    var world = new b2World( new b2Vec2(0.0, 0.0) );
+    world = new b2World( new b2Vec2(0.0, 0.0) );
     //world.SetDebugDraw(myDebugDraw);
     //mouseJointGroundBody = world.CreateBody( new b2BodyDef() );
-    var currentTest = new SetupJustWorm();
+    currentTest = new SetupJustWorm();
     currentTest.setup(world);
 
     //give the worm 20 seconds to get somewhere
-    for(var i = 0; i < 60*8; i++){
-        var angles = currentTest.wormJoints.map(
-            function(currentValue, index, array){
-                return currentValue.GetJointAngle();
-        });
-
-        //what are the current angles
-        var speeds = currentTest.wormJoints.map(
-            function(currentValue, index, array){
-                return currentValue.GetMotorSpeed();
-        });
-
-        //where am i (vector) (heads position)
-        var pos = currentTest.wormBody[0].GetPosition();
-
-        var input = angles.concat(speeds).concat(pos.get_x()).concat(pos.get_y());
-        var nn_output = this.network.activate(input);
-        for(var j = 0; j < currentTest.wormJoints.length; j++){
-            var output = nn_output[j];
-            //is from [0-1], scale to [-1 1]
-            output -= 0.5;
-            output *= 2;
-            currentTest.wormJoints[j].SetMotorSpeed(output);
-        }
-        //advance simulation 1/60 of a second
-        world.Step(1/60, 3, 2);
+    // for(var i = 0; i < 60*8; i++){
+    //10 seconds of 1/5 steps
+    for(var i = 0; i < SIMULATION_SECONDS*FRAME_RATE; i++){
+        var nn_output = this.network.activate(worm_input());
+        apply_output(nn_output);
+        world.Step(1/FRAME_RATE, POS_CHECKS, VEL_CHECKS);
     }
+
+    //get position of head
+    var head_pos = currentTest.wormBody[0].GetPosition();
+
     //clean up memory
+    currentTest.wormBody = [];
+    currentTest.wormJoints = [];
+    currentTest = null;
     var body = world.GetBodyList();
     while(Box2D.getPointer(body)) {
         var next = body.GetNext();
@@ -129,10 +118,9 @@ Gene.prototype.calcCost = function() {
         world.DestroyBody(x);
         body = next;
     }
+    world = null;
     //joints deleted with bodies
 
-    //get position of head
-    var head_pos = currentTest.wormBody[0].GetPosition();
     // //cost is distance to origin
     // this.cost = Math.sqrt(Math.pow(head_pos.get_x(),2) + Math.pow(head_pos.get_y(),2));
     // cost is how far to the left you can travel (more negative is good)

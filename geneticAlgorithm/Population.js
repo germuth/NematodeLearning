@@ -1,4 +1,4 @@
-var POPULATION_SIZE = 30;
+var POPULATION_SIZE = 50;
 var Population = function() {
     this.members = [];
     this.generationNumber = 0;
@@ -8,7 +8,11 @@ var Population = function() {
         // var gene = new Gene(new Architect.Perceptron(9+9, 25, 9));
         //neuron takes in angle and speed of every joint
         //turns it into speed and torque of every joint
-        var gene = new Gene(new Architect.Perceptron(9+9, 25, 9+9));
+
+        //if worm has 3 bodies, it has two joints
+        //each joint has an angle and speed
+        var neurons = (WORM_LENGTH-1) * 2;
+        var gene = new Gene(new Architect.Perceptron(neurons/2, 25, neurons));
         this.members.push(gene);
     }
 };
@@ -53,7 +57,8 @@ Population.prototype.generation = function(iter) {
         return true;
     }
 
-    this.members.length = POPULATION_SIZE; //only keep 50 best
+    // this.members.length = POPULATION_SIZE; //only keep 50 best
+    this.members.splice(50, 50); //remove last 50 elements
     this.generationNumber++;
     return false;
 };

@@ -16,11 +16,13 @@ function createWorld() {
 
   //eval( "currentTest = new "+v+"();" );
   //eval( "currentTest = new embox2dTest_dominos();" );
-  currentTest = new embox2dTest_dominos();
 
-  currentTest.setup();
+  // currentTest = new embox2dTest_dominos();
+  currentTest = new SetupJustWorm();
+
+  currentTest.setup(world);
 }
 
 function updateStats() {
-  
+
 }

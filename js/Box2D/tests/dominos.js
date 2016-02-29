@@ -74,6 +74,7 @@ embox2dTest_dominos.prototype.setup = function() {
             bd.set_type(b2_dynamicBody);
             bd.set_position(new b2Vec2(0.5 + 1.0 * i, y));
             var body = world.CreateBody(bd);
+            body.SetLinearDamping(0.5);
             body.CreateFixture(fd);
 
             if(i != 0){
@@ -86,8 +87,8 @@ embox2dTest_dominos.prototype.setup = function() {
             //add friction to the floor
             var frictionj = new b2FrictionJointDef();
             frictionj.Initialize(body, floor, new b2Vec2(0,0));
-            frictionj.set_maxForce(20.5);
-            frictionj.set_maxTorque(20.5);
+            frictionj.set_maxForce(50.5);
+            frictionj.set_maxTorque(50.5);
             world.CreateJoint(frictionj);
 
             prevBody = body;

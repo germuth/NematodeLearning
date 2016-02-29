@@ -9,10 +9,8 @@ function createWorld() {
     world.SetDebugDraw(myDebugDraw);
 
     mouseJointGroundBody = world.CreateBody( new b2BodyDef() );
-
     //var e = document.getElementById("testSelection");
     //var v = e.options[e.selectedIndex].value;
-
 
     //eval( "currentTest = new "+v+"();" );
     //eval( "currentTest = new embox2dTest_dominos();" );

@@ -28,7 +28,7 @@ function updateStats() {
 }
 
 var iteration = 0;
-var GENETIC_ALGORITHM_ITERATION_COUNT = 100;
+var GENETIC_ALGORITHM_ITERATION_COUNT = 75;
 function doCalculation() {
     population.generation(iteration);
     updateStats();

@@ -1,6 +1,8 @@
 # Using Neural Networks to learn the Neuromuscular activity of Caenorhabditis elegans locomotion
 Aaron Germuth & Alex Aravind
 
+To use this project, download the repo and open the various html files in a browser.
+
 <b>1 Introduction</b>
 
 <i>1.1 C. elegans and Locomotion</i>
